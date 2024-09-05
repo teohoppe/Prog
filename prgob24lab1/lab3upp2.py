@@ -9,11 +9,11 @@ while i <= num_1:
 print()
 
 n = 1
-while n <= num_2:
+while n <= num_2: # Rows
     print(n, end='\t')
 
     k = 1
-    while k <= num_1:
+    while k <= num_1: # Columns
         print(n * k, end='\t')
         k += 1
 
