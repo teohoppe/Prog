@@ -1,5 +1,5 @@
 from tv import TV
-filename = "C:/Users/teoho/Prog/prgob24lab1/tvs.txt"
+filename = "C:/Users/teoho/Prog/prgob24lab1/tvs.txt" # Change this to the path of the file on your computer
 
 def read_file(filename):
     """Reads a file and returns a list of TV objects"""
