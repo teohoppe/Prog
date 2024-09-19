@@ -1,5 +1,7 @@
 from tv import TV
-filename = "C:/Users/teoho/Prog/prgob24lab1/tvs.txt" # Change this to the path of the file on your computer
+import os
+
+filename = "C:/Users/teoho/Prog/prgob24lab1/tvs.txt" # File path 
 
 def read_file(filename):
     """Reads a file and returns a list of TV objects"""
@@ -31,6 +33,12 @@ def write_file(filename, tv_list):
             file.write(tv.str_for_file() + "\n")
 
 
+def clear_screen():
+    """Clears the terminal screen"""
+
+    os.system("cls" if os.name == "nt" else "clear")
+
+
 def adjust_TV_menu():
     """Prints the menu for adjusting the TV and returns the user's choice"""
 
@@ -48,9 +56,12 @@ def adjust_TV_menu():
                 print("Invalid choice, please select between 1-4.")
         except ValueError:
             print("Invalid input. Please enter a number.")
-
+        
 
 def change_channel(tv):
+    """Changes the channel of the TV"""
+
+    # Error handling for invalid input
     try:
         new_channel = int(input("Enter channel: "))
         tv.change_channel(new_channel)
@@ -66,6 +77,7 @@ def main():
         return
     
     while True:
+        # Print the main menu
         print("***Welcome to the TV simulation***")
         for i, tv in enumerate(tv_list):
             print(f"{i+1}. {tv.tv_name}")
@@ -81,7 +93,7 @@ def main():
         except ValueError:
             print("Invalid choice")
             continue
-        
+        clear_screen()
         tv = tv_list[choice-1]
 
         # Submenu for adjusting the TV
@@ -89,12 +101,16 @@ def main():
             print(tv, end="\n")
             sub_choice = adjust_TV_menu()
             if sub_choice == 1:
+                clear_screen()
                 tv.volume_up()
             elif sub_choice == 2:
+                clear_screen()
                 tv.volume_down()
             elif sub_choice == 3:
+                clear_screen()
                 change_channel(tv)
             elif sub_choice == 4:
+                clear_screen()
                 break
 
 
