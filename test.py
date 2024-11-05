@@ -1,160 +1,123 @@
 import time
-import operator
 import os
+import tkinter as tk
+from tkinter import messagebox
 
-class Trollgame:
-    def __init__(self):
-        self.boardsize = 0
+class TrollGameGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Arga Troll Spelet")
+        
+        self.start_time = 0
+        self.board_size = 0
         self.board = []
-        self.position = []
-        self.time = 0
-        self.trolls = 0
+        self.positions = []
+        
+        self.setup_game()
 
-    def clear_screen(self):
-        """Clear the screen."""
-        os.system("cls" if os.name == "nt" else "clear")
+    def setup_game(self):
+        self.intro_label = tk.Label(self.root, text="Välkommen till Arga Troll Spelet!\nVälj storlek på brädet (minst 4x4):")
+        self.intro_label.pack()
 
-    def rules(self):
-        """Print the rules of the game."""
-        print("Welcome to the Troll Game!")
-        print("Rules:")
-        print("1. One troll per row.")
-        print("2. One troll per column.")
-        print("3. No trolls on the same diagonal.")
-        print("Use 'undo' to undo the last move.")
+        self.size_entry = tk.Entry(self.root)
+        self.size_entry.pack()
 
-    def get_boardsize(self):
-        """Get the board size from the user."""
-        while True:
-            try:
-                size = int(input("Enter board size (at least 4x4): "))
-                if size >= 4:
-                    self.boardsize = size
-                    self.board = [["-" for _ in range(size)] for _ in range(size)]
-                    break
-                else:
-                    print("Board size must be at least 4x4.")
-            except ValueError:
-                print("Invalid input. Please enter a number.")
+        self.start_button = tk.Button(self.root, text="Starta spel", command=self.start_game)
+        self.start_button.pack()
 
-    def print_board(self):
-        """Print the current board state."""
-        print("┌" + "─" * (2 * self.boardsize - 1) + "┐")
-        for row in self.board:
-            print("│" + "│".join(row) + "│")
-        print("└" + "─" * (2 * self.boardsize - 1) + "┘")
-        print()
+    def start_game(self):
+        try:
+            size = int(self.size_entry.get())
+            if size >= 4:
+                self.board_size = size
+                self.positions = []
+                self.board = [['_' for _ in range(size)] for _ in range(size)]
+                
+                self.intro_label.pack_forget()
+                self.size_entry.pack_forget()
+                self.start_button.pack_forget()
+                
+                self.create_board()
+                self.start_time = time.time()
+            else:
+                messagebox.showerror("Ogiltig storlek", "Brädet måste vara minst 4x4.")
+        except ValueError:
+            messagebox.showerror("Felaktig inmatning", "Ange ett giltigt heltal för storlek.")
+
+    def create_board(self):
+        self.buttons = [[None for _ in range(self.board_size)] for _ in range(self.board_size)]
+        self.board_frame = tk.Frame(self.root)
+        self.board_frame.pack()
+        
+        for row in range(self.board_size):
+            for col in range(self.board_size):
+                btn = tk.Button(self.board_frame, text='_', width=4, height=2,
+                                command=lambda r=row, c=col: self.handle_click(r, c))
+                btn.grid(row=row, column=col)
+                self.buttons[row][col] = btn
+        
+        self.undo_button = tk.Button(self.root, text="Ångra", command=self.undo_move)
+        self.undo_button.pack()
+
+    def handle_click(self, row, col):
+        if self.board[row][col] == '_':
+            if self.is_valid_position(row, col):
+                self.place_troll(row, col)
+            else:
+                messagebox.showwarning("Ogiltig placering", "Troll får inte placeras på samma rad, kolumn eller diagonal.")
+        elif self.board[row][col] == '*':
+            self.remove_troll(row, col)
+
+        if len(self.positions) == self.board_size:
+            self.end_game()
 
     def place_troll(self, row, col):
-        """Place a troll on the board at the given column."""
-        self.board[row][col] = "*"
-        self.position.append((row, col))
-        self.trolls += 1
+        self.board[row][col] = '*'
+        self.positions.append((row, col))
+        self.buttons[row][col].config(text='*')
 
-    def remove_troll(self):
-        """Remove the most recent troll and return to the previous row."""
-        if self.position:
-            row, col = self.position.pop()
-            self.board[row][col] = "-"
-            self.trolls -= 1
-            return row - 1  # Move back one row
+    def remove_troll(self, row, col):
+        self.board[row][col] = '_'
+        self.positions.remove((row, col))
+        self.buttons[row][col].config(text='_')
+
+    def undo_move(self):
+        if self.positions:
+            row, col = self.positions.pop()
+            self.board[row][col] = '_'
+            self.buttons[row][col].config(text='_')
         else:
-            print("No trolls to remove.")
-            return None
+            messagebox.showinfo("Ingen ångring", "Det finns inget drag att ångra.")
 
-    def check_diagonal(self, row, col):
-        """Check if the troll can be placed on the board without being on the same diagonal as another troll."""
-        for r, c in self.position:
-            if abs(row - r) == abs(col - c):
+    def is_valid_position(self, row, col):
+        for r, c in self.positions:
+            if c == col or abs(row - r) == abs(col - c):
                 return False
         return True
 
-    def play_game(self):
-        """Play the game."""
-        self.time = time.time()
-        row = 0  # Start with the first row
-
-        while row < self.boardsize:
-            self.print_board()
-            try:
-                action = input(f"Place troll in row {row + 1}, choose column between 1-{self.boardsize} or 'undo': ")
-
-                if action.lower() == "undo":
-                    if row == 0:
-                        print("Cannot undo the first move.")
-                    else:
-                        row = self.remove_troll() or row  # Go back one row if undo is successful
-                    continue
-
-                # Place a troll in the specified column
-                col = int(action) - 1
-                if col < 0 or col >= self.boardsize:
-                    raise ValueError("Invalid column")
-
-                if self.check_diagonal(row, col):
-                    self.place_troll(row, col)
-                    row += 1  # Move to the next row
-                else:
-                    print("Troll cannot be placed on the same diagonal.")
-
-            except ValueError:
-                print("Invalid input. Please enter a valid number or 'undo'.")
-
-        # End game if all trolls are placed successfully
-        self.end_game()
-
     def end_game(self):
-        """Display end-game information and save score."""
-        self.print_board()
         end_time = time.time()
-        elapsed_time = end_time - self.time
-        print("Congratulations! You have placed all the trolls.")
-        print(f"Elapsed time: {elapsed_time:.2f} seconds")
+        elapsed_time = end_time - self.start_time
+        messagebox.showinfo("Spelet över", f"Grattis! Du har placerat alla troll utan konflikter.\nTid: {elapsed_time:.2f} sekunder")
         self.save_score(elapsed_time)
-        self.show_scores()
 
     def save_score(self, elapsed_time):
-        """Save the score to the scores file."""
-        score_entry = f"{self.boardsize}x{self.boardsize} - {elapsed_time:.2f} seconds\n"
-        scores = self.load_scores()
-        scores.append((self.boardsize, elapsed_time, score_entry))
-
-        # Sort by board size and time
-        scores = sorted(scores, key=operator.itemgetter(1))
-        scores = sorted(scores, key=operator.itemgetter(0), reverse=True)
-
-        with open("scores.txt", "w") as file:
-            for _, _, entry in scores:
-                file.write(entry)
-        print("Highscore saved!")
-
-    def load_scores(self):
-        """Load the scores from the scores file."""
-        scores = []
-        if os.path.exists("scores.txt"):
-            with open("scores.txt", "r") as file:
-                for line in file:
-                    parts = line.strip().split(" - ")
-                    if len(parts) == 2:
-                        try:
-                            size = int(parts[0].split("x")[0])
-                            time = float(parts[1].split()[0])
-                            scores.append((size, time, line))
-                        except ValueError:
-                            print(f"Skipping malformed line: {line.strip()}")
-        return scores
-
-    def show_scores(self):
-        """Show the scores from the scores file."""
         try:
-            with open("scores.txt", "r") as file:
-                print("Scores:")
-                print(file.read())
+            with open("highscores.txt", "a") as file:
+                file.write(f"{self.board_size}x{self.board_size} - {elapsed_time:.2f} sekunder\n")
+            messagebox.showinfo("Highscore", "Din tid har sparats!")
         except IOError:
-            print("Error reading scores.")
+            messagebox.showerror("Fel", "Kunde inte spara highscore.")
+
+    def show_highscores(self):
+        if os.path.exists("highscores.txt"):
+            with open("highscores.txt", "r") as file:
+                highscores = file.read()
+            messagebox.showinfo("Highscores", highscores)
+        else:
+            messagebox.showinfo("Highscores", "Inga highscores sparade.")
 
 if __name__ == "__main__":
-    game = Trollgame()
-    game.rules()
-    game.get_boardsize()
-    game.play_game()
+    root = tk.Tk()
+    game = TrollGameGUI(root)
+    root.mainloop()
