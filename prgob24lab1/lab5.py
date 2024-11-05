@@ -101,6 +101,7 @@ def main():
             print(tv, end="\n")
             sub_choice = adjust_TV_menu()
             if sub_choice == 1:
+                
                 clear_screen()
                 tv.volume_up()
             elif sub_choice == 2:
