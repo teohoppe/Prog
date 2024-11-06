@@ -29,7 +29,7 @@ class TrollgameGUI():
             if size >= 4:
                 self.boardsize = size
                 self.position = []
-                self.board = [["-" for _ in range(size)] for _ in range(size)]
+                self.board = [["_" for _ in range(size)] for _ in range(size)]
 
                 self.intro_label.pack_forget()
                 self.boardsize_entry.pack_forget()
@@ -54,8 +54,11 @@ class TrollgameGUI():
                 self.buttons[row][col] = button
 
     def handle_click(self, row, col):
+        print("1")
         if self.board[row][col] == "_":
+            print("2")
             if self.is_vaild_position(row, col):
+                print("3")
                 self.place_troll(row, col)
             else:
                 messagebox.showerror("Error", "Invalid position.")
@@ -67,7 +70,7 @@ class TrollgameGUI():
 
     def is_vaild_position(self, row, col):
         for r, c in self.position:
-            if abs(row - r) == abs(col - c):
+            if abs(row - r) == abs(col - c) or row == r or col == c:
                 return False
         return True
     
@@ -77,7 +80,7 @@ class TrollgameGUI():
         self.trolls += 1
         self.buttons[row][col].config(text="*")
 
-    def remove_troll(self):
+    def remove_troll(self, row, col):
         if self.position:
             row, col = self.position.pop()
             self.board[row][col] = "_"
