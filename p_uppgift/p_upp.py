@@ -16,6 +16,7 @@ class Trollgame:
 
     def rules(self):
         """Print the rules of the game."""
+
         print("Welcome to the Troll Game!")
         print("Rules:")
         print("1. One troll per row.")
@@ -31,7 +32,7 @@ class Trollgame:
                 size = int(input("Enter board size (at least 4x4): "))
                 if size >= 4:
                     self.boardsize = size
-                    self.board = [["-" for _ in range(size)] for _ in range(size)]
+                    self.board = [["-" for _ in range(size)] for _ in range(size)] # Create the board (matrix)
                     break
                 else:
                     print("Board size must be at least 4x4.")
@@ -41,11 +42,11 @@ class Trollgame:
     
     def print_board(self):
         """Print the current board state."""
-
-        print("┌" + "─" * (2 * self.boardsize - 1) + "┐")
+ 
+        print("┌" + "─" * (2 * self.boardsize - 1) + "┐") # Custom corners for the board
         for row in self.board:
-            print("│" + "│".join(row) + "│")
-        print("└" + "─" * (2 * self.boardsize - 1) + "┘")
+            print("│" + "│".join(row) + "│")              # Custom sides for the board
+        print("└" + "─" * (2 * self.boardsize - 1) + "┘") # Custom corners for the board
         print()
 
     def place_troll(self, row, col):
@@ -68,8 +69,8 @@ class Trollgame:
     def check_diagonal(self, row, col):
         """Check if the troll can be placed on the board without being on the same diagonal as another troll."""
 
-        for r, c in self.position:
-            if abs(row - r) == abs(col - c):
+        for check_r, check_c in self.position:          # kan va värt att skillja på r och c och row och col
+            if abs(row - check_r) == abs(col - check_c):
                 return False
         return True
 
@@ -82,13 +83,13 @@ class Trollgame:
         # Add new score entry and sort based on board size and time
         scores.append((self.boardsize, elapsed_time, score_entry))
     
-        scores = sorted(scores, key=operator.itemgetter(1))  # Sort by time
+        scores = sorted(scores, key=operator.itemgetter(1))               # Sort by time
         scores = sorted(scores, key=operator.itemgetter(0), reverse=True) # Sort by board size in descending order  
 
         # Write sorted scores back to file
         with open("scores.txt", "w") as file:
             for _, _, entry in scores:
-                file.write(entry)  # Write the score entry string to the file
+                file.write(entry)       # Write the score entry string to the file
         print("Highscore saved!")
 
     def load_scores(self):
@@ -99,9 +100,9 @@ class Trollgame:
             with open("scores.txt", "r") as file:
                 for line in file:
                     parts = line.strip().split(" - ")
-                    if len(parts) == 2:  # Ensure line has exactly two parts
+                    if len(parts) == 2:                          # Ensure line has exactly two parts
                         try:
-                            size = int(parts[0].split("x")[0])  # Extract the board size
+                            size = int(parts[0].split("x")[0])   # Extract the board size
                             time = float(parts[1].split()[0])    # Extract the time
                             scores.append((size, time, line))
                         except ValueError:
@@ -115,15 +116,19 @@ class Trollgame:
             with open("scores.txt", "r") as file:
                 print("Scores:")
                 print(file.read())
-        except IOError:
-            print("Error reading scores.")
+        except IOError:     # IF FILE NOT FOUND
+            print("Error reading scores.")    
     
     def end_game(self):
+        """End the game and show the elapsed time."""
+
         self.print_board()
         end_time = time.time()
         elapsed_time = end_time - self.time
+
         print("Congratulations! You have placed all the trolls.")
         print(f"Elapsed time: {elapsed_time:.2f} seconds")
+
         self.save_score(elapsed_time)
         self.show_scores()             
 
@@ -131,6 +136,7 @@ class Trollgame:
         """Play the game."""
 
         self.time = time.time()
+        self.trolls = 0
 
         while self.trolls != self.boardsize:
             row = self.trolls
@@ -138,6 +144,7 @@ class Trollgame:
             try:
                 place = input(f"Place troll {row + 1} choose colume between 1-{self.boardsize} or 'undo': ")
 
+                # Check if the user wants to undo the last move
                 if place.lower() == "undo":
                     if row == 0:
                         print("Cannot undo the first move.")
@@ -147,6 +154,7 @@ class Trollgame:
                 
                 col = int(place) - 1
                 
+                # Check if the column is within the board size
                 if col < 0 or col >= self.boardsize:
                     raise ValueError
                 else:
@@ -163,11 +171,12 @@ class Trollgame:
 
 
 # An algorithm that plays the Trollgame
-class TrollgameAI(Trollgame):
-    def __init__(self):
-        super().__init__()
+class TrollgameAI(Trollgame): # Inherit from Trollgame      
+    def __init__(self):     
+        super().__init__() # Call the constructor of the parent class
 
-    def play_game(self):
+    # Override the play_game method
+    def play_game(self):    
         """Play the game automatically using a backtracking algorithm."""
 
         self.time = time.time()
@@ -176,9 +185,11 @@ class TrollgameAI(Trollgame):
         else:
             print("No solution found.")
 
+    
     def solve(self, row):
         """Use backtracking to place trolls on the board."""
-        if row == self.boardsize:
+
+        if row == self.boardsize:           # Error handling
             return True
 
         for col in range(self.boardsize):
@@ -194,8 +205,8 @@ class TrollgameAI(Trollgame):
     def is_safe(self, row, col):
         """Check if it's safe to place a troll at (row, col)."""
 
-        for r, c in self.position:
-            if c == col or abs(row - r) == abs(col - c):
+        for check_r, check_c in self.position:
+            if check_c == col or abs(row - check_r) == abs(col - check_c):        # kan va värt att skillja på r och c och row och col
                 return False
         return True
 
@@ -204,17 +215,17 @@ def main():
     game = Trollgame()
     while True:
         try:
-            chois = int(input("1. Play game\n2. Show scores\n3. Let AI play\n: "))
-            if chois == 1:
+            choice = int(input("1. Play game\n2. Show scores\n3. Let AI play\n: "))
+            if choice == 1:
                 game.clear_screen()
                 game.rules()
                 game.get_boardsize()
                 game.play_game()
 
-            elif chois == 2:
+            elif choice == 2:
                 game.show_scores()
 
-            elif chois == 3:
+            elif choice == 3:
                 game = TrollgameAI()
                 game.rules()
                 game.get_boardsize()

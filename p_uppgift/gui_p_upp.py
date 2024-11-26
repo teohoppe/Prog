@@ -1,4 +1,5 @@
-#from p_upp import Trollgame, TrollgameAI
+# Teo Hoppe
+# 2024-11-12
 import time, operator, os
 from tkinter import *
 import tkinter as tk
@@ -14,6 +15,8 @@ class TrollgameGUI():
         self.trolls = 0
 
     def setup_game(self):
+        self.rules()
+
         self.intro_label = Label(self.root, text="Welcome to the Trollgame!\nPleases select the board size(at least 4x4):")
         self.intro_label.pack()
 
@@ -22,6 +25,13 @@ class TrollgameGUI():
 
         self.submit_button = Button(self.root, text="Submit", command=self.start_game)
         self.submit_button.pack()
+
+        # self.score_button = Button(self.root, text="Show scores", command=self.show_scores)
+        # self.score_button.pack()
+
+    def rules(self):
+        self.rules_label = Label(self.root, text="Rules:\n1. One troll per row.\n2. One troll per column.\n3. No trolls on the same diagonal.")
+        self.rules_label.pack()
 
     def start_game(self):
         try:
@@ -34,6 +44,8 @@ class TrollgameGUI():
                 self.intro_label.pack_forget()
                 self.boardsize_entry.pack_forget()
                 self.submit_button.pack_forget()
+                self.rules_label.pack_forget()
+
 
                 self.create_board()
                 self.time = time.time()
@@ -90,8 +102,10 @@ class TrollgameGUI():
     def end_game(self):
         end_time = time.time()
         time_elapsed = end_time - self.time
-        messagebox.showinfo(f"Congratulations! You have placed all the trolls in {time_elapsed:.2f} seconds.")
+        messagebox.showinfo(f"Congratulations!",f"You have placed all the trolls in {time_elapsed:.2f} seconds.")
+        
         self.save_score(time_elapsed)
+        self.show_scores()
 
     def save_score(self, elapsed_time):
         """Save the score to the scores file."""
@@ -128,13 +142,32 @@ class TrollgameGUI():
                             print(f"Skipping malformed line: {line.strip()}")
         return scores
         
+    def restart_game(self):
+        self.setup_game()
+        self.frame.pack_forget()
+        self.score_frame.pack_forget()
+        self.score_label.pack_forget()
+        self.play_again_button.pack_forget()
+        self.rules_label.pack_forget()
+
     def show_scores(self):
+        try:
+            self.frame.pack_forget()
+        except AttributeError:
+            pass
+        
         self.score_frame = tk.Frame(self.root)
         self.score_frame.pack()
 
+        self.play_again_button = Button(self.score_frame, text="Play again", command=self.restart_game)
+        self.play_again_button.pack()
+
+        self.score_label = Label(self.score_frame, text="Scores:")
+        self.score_label.pack()
+
         try:
             with open("scores.txt", "r") as file:
-                scores = file.read()
+                scores = "\n".join(file.read().splitlines()[:10])
                 self.score_label = Label(self.score_frame, text=scores)
                 self.score_label.pack()
         except IOError:
@@ -146,8 +179,3 @@ if __name__ == "__main__":
     game = TrollgameGUI(root)
     game.setup_game()
     root.mainloop()
-
-    
-        
-        
-
