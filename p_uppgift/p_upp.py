@@ -66,8 +66,8 @@ class Trollgame:
         except IndexError:
             print("No trolls to remove.")
 
-    def check_diagonal(self, row, col):
-        """Check if the troll can be placed on the board without being on the same diagonal as another troll."""
+    def is_valid_position(self, row, col):
+        """Check if the troll can be placed on the board without being on the same diagonal or column as another troll."""
 
         for check_r, check_c in self.position:
             if abs(row - check_r) == abs(col - check_c) or row == check_r or col == check_c:
@@ -88,7 +88,7 @@ class Trollgame:
 
         # Write sorted scores back to file
         with open("scores.txt", "w") as file:
-            for _, _, entry in scores:
+            for _, _, entry in scores:  # Iterate over the sorted scores
                 file.write(entry)       # Write the score entry string to the file
         print("Highscore saved!")
 
@@ -96,7 +96,7 @@ class Trollgame:
         """Load the scores from the scores file."""
 
         scores = []
-        if os.path.exists("scores.txt"):
+        if os.path.exists("scores.txt"):                        # Check if the file exists
             with open("scores.txt", "r") as file:
                 for line in file:
                     parts = line.strip().split(" - ")
@@ -163,7 +163,7 @@ class Trollgame:
                 if col < 0 or col >= self.boardsize:
                     raise ValueError
                 else:
-                    if self.check_diagonal(row, col):
+                    if self.is_valid_position(row, col):
                         self.place_troll(row, col)
                         continue
                     else:
@@ -203,7 +203,7 @@ class TrollgameAI(Trollgame): # Inherit from Trollgame
 
                 if self.solve(row + 1):
                     return True
-                self.remove_troll(row, col)
+                self.remove_troll()
 
         return False
 
@@ -211,7 +211,7 @@ class TrollgameAI(Trollgame): # Inherit from Trollgame
         """Check if it's safe to place a troll at (row, col)."""
 
         for check_r, check_c in self.position:
-            if check_c == col or abs(row - check_r) == abs(col - check_c):        # kan va värt att skillja på r och c och row och col
+            if check_c == col or abs(row - check_r) == abs(col - check_c):
                 return False
         return True
 

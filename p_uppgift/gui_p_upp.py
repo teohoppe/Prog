@@ -15,9 +15,14 @@ class TrollgameGUI():
         self.trolls = 0
 
     def setup_game(self):
+        """Setup the game by displaying the rules and getting the board size from the user."""
+
         self.rules()
 
-        self.intro_label = Label(self.root, text="Welcome to the Trollgame!\nPleases select the board size(at least 4x4):")
+        self.intro_label = Label(
+                self.root, 
+                text="Welcome to the Trollgame!\nPleases select the board size(at least 4x4):"
+                )
         self.intro_label.pack()
 
         self.boardsize_entry = Entry(self.root)
@@ -26,26 +31,34 @@ class TrollgameGUI():
         self.submit_button = Button(self.root, text="Submit", command=self.start_game)
         self.submit_button.pack()
 
-        # self.score_button = Button(self.root, text="Show scores", command=self.show_scores)
-        # self.score_button.pack()
 
     def rules(self):
-        self.rules_label = Label(self.root, text="Rules:\n1. One troll per row.\n2. One troll per column.\n3. No trolls on the same diagonal.")
+        """Display the rules of the game."""
+
+        self.rules_label = Label(
+                self.root, 
+                text="Rules:\n"
+                "1. One troll per row.\n"
+                "2. One troll per column.\n"
+                "3. No trolls on the same diagonal."
+                )
         self.rules_label.pack()
 
     def start_game(self):
+        """Start the game by creating the board and setting the time."""
+
         try:
             size = int(self.boardsize_entry.get())
             if size >= 4:
                 self.boardsize = size
                 self.position = []
-                self.board = [["_" for _ in range(size)] for _ in range(size)]
+                self.board = [["_" for _ in range(size)] for _ in range(size)] # Create the board (matrix)
 
+                # Clear the screen
                 self.intro_label.pack_forget()
                 self.boardsize_entry.pack_forget()
                 self.submit_button.pack_forget()
                 self.rules_label.pack_forget()
-
 
                 self.create_board()
                 self.time = time.time()
@@ -55,46 +68,64 @@ class TrollgameGUI():
             messagebox.showerror("Error", "Invalid input. Please enter a number.")
 
     def create_board(self):
-        self.buttons = [[None for _ in range(self.boardsize)] for _ in range(self.boardsize)]
+        """Create the game board using buttons."""
+
+        # Create a 2D list to store the buttons
+        self.buttons = [[None for _ in range(self.boardsize)] for _ in range(self.boardsize)] 
         self.frame = tk.Frame(self.root)
         self.frame.pack()
 
+        # Create buttons for each cell in the board
         for row in range(self.boardsize):
             for col in range(self.boardsize):
-                button = Button(self.frame, text="_", width=4, height=2, command=lambda r=row, c=col: self.handle_click(r, c))
+                button = Button(
+                    self.frame, 
+                    text="_", 
+                    width=4, 
+                    height=2, 
+                    command=lambda r=row, c=col: self.handle_click(r, c)
+                )
                 button.grid(row=row, column=col)
                 self.buttons[row][col] = button
 
     def handle_click(self, row, col):
-        print("1")
+        """Handle the button click event."""
+
         if self.board[row][col] == "_":
-            print("2")
-            if self.is_vaild_position(row, col):
-                print("3")
+            if self.is_valid_position(row, col):
+                # Place the troll on the board and change the button color
                 self.place_troll(row, col)
                 self.buttons[row][col].config(bg="green")
             else:
                 messagebox.showerror("Error", "Invalid position.")
         elif self.board[row][col] == "*":
+            # Remove the troll from the board and reset the button color
             self.remove_troll(row, col)
             self.buttons[row][col].config(bg="white")
 
+        # Check if the game is over
         if len(self.position) == self.boardsize:
             self.end_game()
 
-    def is_vaild_position(self, row, col):
+    def is_valid_position(self, row, col):
+        """Check if the troll can be placed without being on the same diagonal or column as another troll."""
+
         for check_r, check_c in self.position:
             if abs(row - check_r) == abs(col - check_c) or row == check_r or col == check_c:
                 return False
         return True
     
     def place_troll(self, row, col):
+        """Place a troll on the board at the given position."""
+        
         self.board[row][col] = "*"
         self.position.append((row, col))
         self.trolls += 1
         self.buttons[row][col].config(text="*")
 
     def remove_troll(self, row, col):
+        """Remove the troll from the given position."""
+
         if self.position:
             row, col = self.position.pop()
             self.board[row][col] = "_"
@@ -102,6 +133,8 @@ class TrollgameGUI():
             self.buttons[row][col].config(text="_")
 
     def end_game(self):
+        """End the game and display the time taken to place all the trolls."""
+
         end_time = time.time()
         time_elapsed = end_time - self.time
         messagebox.showinfo(f"Congratulations!",f"You have placed all the trolls in {time_elapsed:.2f} seconds.")
@@ -145,6 +178,8 @@ class TrollgameGUI():
         return scores
         
     def restart_game(self):
+        """Restart the game by resetting the board and position."""
+
         self.setup_game()
         self.frame.pack_forget()
         self.score_frame.pack_forget()
@@ -153,6 +188,8 @@ class TrollgameGUI():
         self.rules_label.pack_forget()
 
     def show_scores(self):
+        """Show the scores from the scores file."""
+
         try:
             self.frame.pack_forget()
         except AttributeError:
