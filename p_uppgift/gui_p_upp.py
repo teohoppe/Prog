@@ -72,17 +72,19 @@ class TrollgameGUI():
             if self.is_vaild_position(row, col):
                 print("3")
                 self.place_troll(row, col)
+                self.buttons[row][col].config(bg="green")
             else:
                 messagebox.showerror("Error", "Invalid position.")
         elif self.board[row][col] == "*":
             self.remove_troll(row, col)
+            self.buttons[row][col].config(bg="white")
 
         if len(self.position) == self.boardsize:
             self.end_game()
 
     def is_vaild_position(self, row, col):
-        for r, c in self.position:
-            if abs(row - r) == abs(col - c) or row == r or col == c:
+        for check_r, check_c in self.position:
+            if abs(row - check_r) == abs(col - check_c) or row == check_r or col == check_c:
                 return False
         return True
     

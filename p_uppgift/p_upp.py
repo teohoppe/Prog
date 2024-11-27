@@ -69,8 +69,8 @@ class Trollgame:
     def check_diagonal(self, row, col):
         """Check if the troll can be placed on the board without being on the same diagonal as another troll."""
 
-        for check_r, check_c in self.position:          # kan va värt att skillja på r och c och row och col
-            if abs(row - check_r) == abs(col - check_c):
+        for check_r, check_c in self.position:
+            if abs(row - check_r) == abs(col - check_c) or row == check_r or col == check_c:
                 return False
         return True
 
@@ -137,7 +137,8 @@ class Trollgame:
 
         self.time = time.time()
         self.trolls = 0
-
+        self.position = [] # Reset the position list
+        
         while self.trolls != self.boardsize:
             row = self.trolls
             self.print_board()
@@ -154,6 +155,10 @@ class Trollgame:
                 
                 col = int(place) - 1
                 
+                if any(existing_col == col for _, existing_col in self.position):
+                    print("Troll cannot be placed in the same column as another troll.")
+                    continue
+
                 # Check if the column is within the board size
                 if col < 0 or col >= self.boardsize:
                     raise ValueError
