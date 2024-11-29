@@ -1,5 +1,5 @@
 # Teo Hoppe
-# 2024-11-12
+# 2024-11-29
 import time, operator, os
 from tkinter import *
 import tkinter as tk
@@ -10,28 +10,12 @@ class TrollgameGUI():
         self.root = root
         self.root.title("Trollgame")
 
-        self.boardsize = 0
         self.position = []
+
+        self.boardsize = 0
         self.trolls = 0
+
         self.file = "p_uppgift/scores.txt"
-
-    def setup_game(self):
-        """Setup the game by displaying the rules and getting the board size from the user."""
-
-        self.rules()
-
-        self.intro_label = Label(
-                self.root, 
-                text="Welcome to the Trollgame!\nPleases select the board size(at least 4x4):"
-                )
-        self.intro_label.pack()
-
-        self.boardsize_entry = Entry(self.root)
-        self.boardsize_entry.pack()
-
-        self.submit_button = Button(self.root, text="Submit", command=self.start_game)
-        self.submit_button.pack()
-
 
     def rules(self):
         """Display the rules of the game."""
@@ -44,6 +28,24 @@ class TrollgameGUI():
                 "3. No trolls on the same diagonal."
                 )
         self.rules_label.pack()
+
+    def setup_game(self):
+        """Setup the game by displaying the rules and getting the board size from the user."""
+
+        self.rules()
+
+        # Creat labels and entry for board size and submit button
+        self.intro_label = Label(
+                self.root, 
+                text="Welcome to the Trollgame!\nPleases select the board size(at least 4x4):"
+            )
+        self.intro_label.pack()
+
+        self.boardsize_entry = Entry(self.root)
+        self.boardsize_entry.pack()
+
+        self.submit_button = Button(self.root, text="Submit", command=self.start_game)
+        self.submit_button.pack()
 
     def start_game(self):
         """Start the game by creating the board and setting the time."""
@@ -97,6 +99,7 @@ class TrollgameGUI():
                 # Place the troll on the board and change the button color
                 self.place_troll(row, col)
                 self.buttons[row][col].config(bg="green")
+
             else:
                 messagebox.showerror("Error", "Invalid position.")
         elif self.board[row][col] == "*":
@@ -111,7 +114,8 @@ class TrollgameGUI():
     def is_valid_position(self, row, col):
         """Check if the troll can be placed without being on the same diagonal or column as another troll."""
 
-        for check_r, check_c in self.position:
+        for check_r, check_c in self.position: # Iterate over the existing trolls
+            # Check if the troll is on the same diagonal or column as another troll
             if abs(row - check_r) == abs(col - check_c) or row == check_r or col == check_c:
                 return False
         return True
@@ -165,8 +169,8 @@ class TrollgameGUI():
         """Load the scores from the scores file."""
 
         scores = []
-        if os.path.exists(self.file):
-            with open(self.file, "r") as file:
+        if os.path.exists(self.file): # Check if the file exists
+            with open(self.file, "r") as file: 
                 for line in file:
                     parts = line.strip().split(" - ")
                     if len(parts) == 2:  # Ensure line has exactly two parts
@@ -191,6 +195,7 @@ class TrollgameGUI():
     def show_scores(self):
         """Show the scores from the scores file."""
 
+        # Clear the screen
         try:
             self.frame.pack_forget()
         except AttributeError:

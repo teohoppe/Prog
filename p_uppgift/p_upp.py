@@ -1,15 +1,26 @@
+# Teo Hoppe
+# 2024-11-29
 import time
 import operator 
 import os
 
 class Trollgame:
     def __init__(self):
-        self.boardsize = 0
+        
         self.board = []
         self.position = []
+        
+        self.boardsize = 0
         self.time = 0
         self.trolls = 0
+
         self.file = "p_uppgift/scores.txt"
+
+    def start_game(self):
+        self.clear_screen()
+        self.rules()
+        self.get_boardsize()
+        self.play_game()
 
     def clear_screen(self):
         """Clear the screen."""
@@ -70,7 +81,9 @@ class Trollgame:
     def is_valid_position(self, row, col):
         """Check if the troll can be placed on the board without being on the same diagonal or column as another troll."""
 
-        for check_r, check_c in self.position:
+        for check_r, check_c in self.position: # Iterate over the existing trolls
+
+            # Check if the troll is on the same diagonal or column as another troll
             if abs(row - check_r) == abs(col - check_c) or row == check_r or col == check_c:
                 return False
         return True
@@ -136,15 +149,15 @@ class Trollgame:
     def play_game(self):
         """Play the game."""
 
-        self.time = time.time()
-        self.trolls = 0
+        self.time = time.time() # Start the timer
+        self.trolls = 0 # Reset the number of trolls
         self.position = [] # Reset the position list
         
         while self.trolls != self.boardsize:
             row = self.trolls
             self.print_board()
             try:
-                place = input(f"Place troll {row + 1} choose colume between 1-{self.boardsize} or 'undo': ")
+                place = input(f"Place troll {row + 1} choose colume between 1-{self.boardsize} or 'undo'or 'break' to quit: ")
 
                 # Check if the user wants to undo the last move
                 if place.lower() == "undo":
@@ -153,9 +166,12 @@ class Trollgame:
                         continue
                     self.remove_troll()
                     continue
+                elif place.lower() == "break":
+                    break
                 
                 col = int(place) - 1
                 
+                # Check if the column is within the board size
                 if any(existing_col == col for _, existing_col in self.position):
                     print("Troll cannot be placed in the same column as another troll.")
                     continue
@@ -173,13 +189,20 @@ class Trollgame:
             except ValueError:
                 print("Invalid input. Please enter a valid numer or 'undo'.")
                 continue
-        self.end_game()
+
+        if self.trolls == self.boardsize:
+            self.end_game()
 
 
 # An algorithm that plays the Trollgame
 class TrollgameAI(Trollgame): # Inherit from Trollgame      
     def __init__(self):     
         super().__init__() # Call the constructor of the parent class
+
+    def start(self):
+        self.rules()
+        self.get_boardsize()
+        self.play_game()
 
     # Override the play_game method
     def play_game(self):    
@@ -190,7 +213,6 @@ class TrollgameAI(Trollgame): # Inherit from Trollgame
             self.end_game()
         else:
             print("No solution found.")
-
     
     def solve(self, row):
         """Use backtracking to place trolls on the board."""
@@ -198,6 +220,7 @@ class TrollgameAI(Trollgame): # Inherit from Trollgame
         if row == self.boardsize:           # Error handling
             return True
 
+        # Try to place a troll in each column of the current row 
         for col in range(self.boardsize):
             if self.is_safe(row, col):
                 self.place_troll(row, col)
@@ -211,8 +234,9 @@ class TrollgameAI(Trollgame): # Inherit from Trollgame
     def is_safe(self, row, col):
         """Check if it's safe to place a troll at (row, col)."""
 
-        for check_r, check_c in self.position:
-            if check_c == col or abs(row - check_r) == abs(col - check_c):
+        for check_r, check_c in self.position: # Iterate over the existing trolls
+            # Check if the troll is in the same column or diagonal as another troll
+            if check_c == col or abs(row - check_r) == abs(col - check_c): 
                 return False
         return True
 
@@ -221,21 +245,19 @@ def main():
     game = Trollgame()
     while True:
         try:
-            choice = int(input("1. Play game\n2. Show scores\n3. Let AI play\n: "))
+            choice = int(input("1. Play game\n2. Show scores\n3. Let AI play\n4. Exit\nEnter choice: "))
             if choice == 1:
-                game.clear_screen()
-                game.rules()
-                game.get_boardsize()
-                game.play_game()
+                game.start_game()
 
             elif choice == 2:
                 game.show_scores()
 
             elif choice == 3:
                 game = TrollgameAI()
-                game.rules()
-                game.get_boardsize()
-                game.play_game()
+                game.start()
+
+            elif choice == 4:
+                break
             else:
                 print("Invalid input. Please enter a valid number.")
         except ValueError:
