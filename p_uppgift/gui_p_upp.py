@@ -4,6 +4,7 @@ import time, operator, os
 from tkinter import *
 import tkinter as tk
 from tkinter import messagebox
+from p_upp import TrollgameAI
 
 class TrollgameGUI():
     def __init__(self, root):
@@ -31,14 +32,13 @@ class TrollgameGUI():
 
     def setup_game(self):
         """Setup the game by displaying the rules and getting the board size from the user."""
-
         self.rules()
 
-        # Creat labels and entry for board size and submit button
+        # Create labels and entry for board size and submit button
         self.intro_label = Label(
-                self.root, 
-                text="Welcome to the Trollgame!\nPleases select the board size(at least 4x4):"
-            )
+            self.root,
+            text="Welcome to the Trollgame!\nPlease select the board size (at least 4x4):"
+        )
         self.intro_label.pack()
 
         self.boardsize_entry = Entry(self.root)
@@ -47,15 +47,17 @@ class TrollgameGUI():
         self.submit_button = Button(self.root, text="Submit", command=self.start_game)
         self.submit_button.pack()
 
+        self.aiplay_button = Button(self.root, text="Let AI play", command=self.ai_play, state=DISABLED)
+        self.aiplay_button.pack()
+
     def start_game(self):
         """Start the game by creating the board and setting the time."""
-
         try:
             size = int(self.boardsize_entry.get())
             if size >= 4:
                 self.boardsize = size
                 self.position = []
-                self.board = [["_" for _ in range(size)] for _ in range(size)] # Create the board (matrix)
+                self.board = [["_" for _ in range(size)] for _ in range(size)]  # Create the board (matrix)
 
                 # Clear the screen
                 self.intro_label.pack_forget()
@@ -65,6 +67,9 @@ class TrollgameGUI():
 
                 self.create_board()
                 self.time = time.time()
+
+                # Enable the AI button
+                self.aiplay_button.config(state=NORMAL)
             else:
                 messagebox.showerror("Error", "Board size must be at least 4x4.")
         except ValueError:
@@ -130,12 +135,11 @@ class TrollgameGUI():
 
     def remove_troll(self, row, col):
         """Remove the troll from the given position."""
-
-        if self.position:
-            row, col = self.position.pop()
+        if (row, col) in self.position:
+            self.position.remove((row, col))
             self.board[row][col] = "_"
             self.trolls -= 1
-            self.buttons[row][col].config(text="_")
+            self.buttons[row][col].config(text="_", bg="white")
 
     def end_game(self):
         """End the game and display the time taken to place all the trolls."""
@@ -218,6 +222,23 @@ class TrollgameGUI():
         except IOError:
             messagebox.showerror("Error", "Error reading scores.")
 
+    def ai_play(self):
+        """Let the AI play the game."""
+        ai = TrollgameAI()  # Initialize the AI without passing the board size
+        ai.boardsize = self.boardsize  # Set the board size for the AI
+        ai.board = [["_" for _ in range(self.boardsize)] for _ in range(self.boardsize)]  # Initialize the AI's board
+        
+        # Solve the board using AI
+        if ai.solve(0):
+            for row, col in ai.position:
+                self.place_troll(row, col)
+                self.buttons[row][col].config(bg="green")
+            self.end_game()
+
+            self.aiplay_button.config(state=DISABLED)  # Disable the AI button after AI has played
+            self.aiplay_button.pack_forget()
+        else:
+            messagebox.showerror("Error", "No solution found by AI.")
 
 if __name__ == "__main__":
     root = tk.Tk()

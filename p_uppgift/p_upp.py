@@ -9,7 +9,7 @@ class Trollgame:
         
         self.board = []
         self.position = []
-        
+
         self.boardsize = 0
         self.time = 0
         self.trolls = 0
@@ -242,14 +242,16 @@ class TrollgameAI(Trollgame): # Inherit from Trollgame
 
 
 def main():
-    game = Trollgame()
+
     while True:
         try:
             choice = int(input("1. Play game\n2. Show scores\n3. Let AI play\n4. Exit\nEnter choice: "))
             if choice == 1:
+                game = Trollgame()
                 game.start_game()
 
             elif choice == 2:
+                game = Trollgame()
                 game.show_scores()
 
             elif choice == 3:
