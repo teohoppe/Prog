@@ -9,6 +9,7 @@ class Trollgame:
         self.position = []
         self.time = 0
         self.trolls = 0
+        self.file = "p_uppgift/scores.txt"
 
     def clear_screen(self):
         """Clear the screen."""
@@ -87,7 +88,7 @@ class Trollgame:
         scores = sorted(scores, key=operator.itemgetter(0), reverse=True) # Sort by board size in descending order  
 
         # Write sorted scores back to file
-        with open("p_uppgift/scores.txt", "w") as file:
+        with open(self.file, "w") as file:
             for _, _, entry in scores:  # Iterate over the sorted scores
                 file.write(entry)       # Write the score entry string to the file
         print("Highscore saved!")
@@ -96,8 +97,8 @@ class Trollgame:
         """Load the scores from the scores file."""
 
         scores = []
-        if os.path.exists("p_uppgift/scores.txt"):                        # Check if the file exists
-            with open("p_uppgift/scores.txt", "r") as file:
+        if os.path.exists(self.file):                        # Check if the file exists
+            with open(self.file, "r") as file:
                 for line in file:
                     parts = line.strip().split(" - ")
                     if len(parts) == 2:                          # Ensure line has exactly two parts
@@ -113,7 +114,7 @@ class Trollgame:
         """Show the scores from the scores file."""
 
         try: 
-            with open("p_uppgift/scores.txt", "r") as file:
+            with open(self.file, "r") as file:
                 print("Scores:")
                 print(file.read())
         except IOError:     # IF FILE NOT FOUND

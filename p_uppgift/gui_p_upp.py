@@ -13,6 +13,7 @@ class TrollgameGUI():
         self.boardsize = 0
         self.position = []
         self.trolls = 0
+        self.file = "p_uppgift/scores.txt"
 
     def setup_game(self):
         """Setup the game by displaying the rules and getting the board size from the user."""
@@ -155,7 +156,7 @@ class TrollgameGUI():
         scores = sorted(scores, key=operator.itemgetter(0), reverse=True) # Sort by board size in descending order  
 
         # Write sorted scores back to file
-        with open("scores.txt", "w") as file:
+        with open(self.file, "w") as file:
             for _, _, entry in scores:
                 file.write(entry)  # Write the score entry string to the file
         print("Highscore saved!")
@@ -164,8 +165,8 @@ class TrollgameGUI():
         """Load the scores from the scores file."""
 
         scores = []
-        if os.path.exists("scores.txt"):
-            with open("scores.txt", "r") as file:
+        if os.path.exists(self.file):
+            with open(self.file, "r") as file:
                 for line in file:
                     parts = line.strip().split(" - ")
                     if len(parts) == 2:  # Ensure line has exactly two parts
@@ -205,7 +206,7 @@ class TrollgameGUI():
         self.score_label.pack()
 
         try:
-            with open("scores.txt", "r") as file:
+            with open(self.file, "r") as file:
                 scores = "\n".join(file.read().splitlines()[:10])
                 self.score_label = Label(self.score_frame, text=scores)
                 self.score_label.pack()
