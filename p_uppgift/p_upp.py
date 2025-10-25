@@ -14,7 +14,7 @@ class Trollgame:
         self.time = 0
         self.trolls = 0
 
-        self.file = "p_uppgift/scores.txt"
+        self.file = "scores.txt"
 
     def start_game(self):
         self.clear_screen()

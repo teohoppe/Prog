@@ -9,9 +9,10 @@ amount = int(input("Hur många paket har du? "))
 #     weight += int(input("Hur mycket väger paketet? "))
 
 # Calculate the price of the shipment
-while n < amount:
+n = 0
+while n <= amount:
     n += 1
-    weight = float(input("Hur mycket väger paketet? "))
+    weight = float(input(f"Hur mycket väger paket {n}? "))
 
     if weight < 2:
         ship_price += weight * 30

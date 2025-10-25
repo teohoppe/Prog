@@ -16,7 +16,7 @@ class TrollgameGUI():
         self.boardsize = 0
         self.trolls = 0
 
-        self.file = "p_uppgift/scores.txt"
+        self.file = "scores.txt"
 
     def rules(self):
         """Display the rules of the game."""
