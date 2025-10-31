@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-# Del a
+# Del a)
 
 def naiv_ansats():
     x = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
@@ -69,7 +69,6 @@ def newton_ansats():
             sumpoly += a[n]*prodpoly  
         return sumpoly
     
-    # Evaluera polynom i många punkter för plot
     xfine = np.linspace(xdata[0], xdata[-1],1000)
     yfine = polyNewton(a,xdata,xfine)
 
@@ -117,5 +116,58 @@ def centrerad_ansats():
     plt.show()
         
 
+#centrerad_ansats()
 
-centrerad_ansats()
+
+
+# Del b)
+
+def MK_ansats():
+    x = np.array([4, 5, 6, 7, 8])
+    y = np.array([871, 1021, 1109, 1066, 929])
+
+    ones = np.ones(np.shape(x))
+    A = np.array([ones, x, x**2]).T
+    print(A)
+
+    aTa = A.T @ A
+    aTy = A.T @ y
+
+    c = np.linalg.solve(aTa, aTy)
+    for i in range(len(c)):
+        print(f"c[{i}] = {c[i]}")
+
+    def model(c, x):
+        return c[0] + c[1]*x + c[2]*x**2
+
+    r = A@c - y
+    MKfel = sum(r**2)
+    print(f'MK-fel: {MKfel}')
+    # Plotta
+
+    xfine = np.linspace(x[0],x[-1], num=1000)
+    yfine = model(c,xfine)
+
+    # Plotta data och rät linje
+    plt.plot(x, y, 'o', label='Data', markersize=10)
+    plt.plot(xfine, yfine, 'r', label='Anpassad rät linje')
+    # Plotta avstånden mellan den räta linjen och data
+    plt.plot([x[0], x[0]], [y[0], y[0]+r[0]],'g',label='Residual r[0]', markersize=10)
+    plt.plot([x[1], x[1]], [y[1], y[1]+r[1]],'y',label='Residual r[1]', markersize=10)
+    plt.plot([x[2], x[2]], [y[2], y[2]+r[2]],'k',label='Residual r[2]', markersize=10)
+    plt.legend()
+    plt.show()    
+
+MK_ansats()
+
+while True: 
+    chois = int(input("välj"))
+    if chois == 1:
+        naiv_ansats()
+    elif chois == 2:
+        newton_ansats()
+    elif chois == 3:
+        centrerad_ansats()
+
+    else:
+        break
