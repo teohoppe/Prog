@@ -7,13 +7,13 @@ def naiv_ansats():
     y = np.array([421, 553, 709, 871, 1021, 1109, 1066, 929, 771, 612, 463, 374])
 
     Anaiv = np.vander(x,12, increasing=True)
-    #print(Anaiv)
+    print(Anaiv)
 
     c = np.linalg.solve(Anaiv, y)
-    # for i in range(len(c)):
-    #     print(f'c[{i}] = {c[i]}')
+    for i in range(len(c)):
+        print(f'c[{i}] = {c[i]}')
 
-    #print(f"\nThe polynomial is:{c[0]} + {c[1]}x + {c[2]}x^2 + {c[3]}x^3 + {c[4]}x^4 + {c[5]}x^5 + {c[6]}x^6 + {c[7]}x^7 + {c[8]}x^8 + {c[9]}x^9 + {c[10]}x^10 + {c[11]}x^11")
+    print(f"\nThe polynomial is:{c[0]} + {c[1]}x + {c[2]}x^2 + {c[3]}x^3 + {c[4]}x^4 + {c[5]}x^5 + {c[6]}x^6 + {c[7]}x^7 + {c[8]}x^8 + {c[9]}x^9 + {c[10]}x^10 + {c[11]}x^11")
 
     pol1 = lambda c, x: c[0] + c[1]*x + c[2]*x**2 + c[3]*x**3 + c[4]*x**4 + c[5]*x**5 + c[6]*x**6 + c[7]*x**7 + c[8]*x**8 + c[9]*x**9 + c[10]*x**10 + c[11]*x**11
 
@@ -21,8 +21,6 @@ def naiv_ansats():
     print(pvalue)
 
     # Plotting
-
-    # Create more points for a smooth curve
     x_smooth = np.linspace(x[0], x[-1], 1000)
     y_smooth = pol1(c, x_smooth)
 
@@ -34,9 +32,7 @@ def naiv_ansats():
     plt.grid(True)
     plt.show()
 
-#naiv_ansats()
 
-# Newtons method for polynomial fitting
 def newton_ansats():
     xdata = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
     ydata = np.array([421, 553, 709, 871, 1021, 1109, 1066, 929, 771, 612, 463, 374])
@@ -84,8 +80,6 @@ def newton_ansats():
     plt.show()
 
 
-#newton_ansats()
-
 def centrerad_ansats():
     x = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
     y = np.array([421, 553, 709, 871, 1021, 1109, 1066, 929, 771, 612, 463, 374])
@@ -99,11 +93,11 @@ def centrerad_ansats():
     for i in range(len(c)):
         print(f'c[{i}] = {c[i]}')
 
-        def pol_centrerad(c, x, t_mean):
-            return sum(c[i] * (x - x_mean)**i for i in range(len(c)))
+    def pol_centrerad(c, x, x_mean):
+        return sum(c[i] * (x - x_mean)**i for i in range(len(c)))
 
     # Rita ut
-    x_smooth = np.linspace(x[0], x[-1], 300)
+    x_smooth = np.linspace(x[0], x[-1], 1000)
     y_smooth = pol_centrerad(c, x_smooth, x_mean)
 
     plt.plot(x, y, 'bo', label='Datapunkter')
@@ -116,11 +110,7 @@ def centrerad_ansats():
     plt.show()
         
 
-#centrerad_ansats()
-
-
-
-# Del b)
+# Del c)
 
 def MK_ansats():
     x = np.array([4, 5, 6, 7, 8])
@@ -155,19 +145,99 @@ def MK_ansats():
     plt.plot([x[0], x[0]], [y[0], y[0]+r[0]],'g',label='Residual r[0]', markersize=10)
     plt.plot([x[1], x[1]], [y[1], y[1]+r[1]],'y',label='Residual r[1]', markersize=10)
     plt.plot([x[2], x[2]], [y[2], y[2]+r[2]],'k',label='Residual r[2]', markersize=10)
+    plt.plot([x[3], x[3]], [y[3], y[3]+r[3]],'m',label='Residual r[3]', markersize=10)
+    plt.plot([x[4], x[4]], [y[4], y[4]+r[4]],'c',label='Residual r[4]', markersize=10)
     plt.legend()
     plt.show()    
 
-MK_ansats()
+# Del d)
+def MK_ansats_tredgerad():
+    x = np.array([4, 5, 6, 7, 8])
+    y = np.array([871, 1021, 1109, 1066, 929])
+
+    ones = np.ones(np.shape(x))
+    A = np.array([ones, x, x**2, x**3]).T
+    print(A)
+    aTa = A.T @ A
+    aTy = A.T @ y
+    c = np.linalg.solve(aTa, aTy)
+    for i in range(len(c)):
+        print(f"c[{i}] = {c[i]}")
+
+    def model(c, x):
+        return c[0] + c[1]*x + c[2]*x**2 + c[3]*x**3     
+    
+    r = A@c - y
+    MKfel = sum(r**2)
+    print(f'MK-fel: {MKfel}')
+    # Plotta
+
+    xfine = np.linspace(x[0],x[-1], num=1000)
+    yfine = model(c,xfine)
+
+    # Plotta data och rät linje
+    plt.plot(x, y, 'o', label='Data', markersize=10)
+    plt.plot(xfine, yfine, 'r', label='Anpassad rät linje')
+    # Plotta avstånden mellan den räta linjen och data
+    plt.plot([x[0], x[0]], [y[0], y[0]+r[0]],'g',label='Residual r[0]', markersize=10)
+    plt.plot([x[1], x[1]], [y[1], y[1]+r[1]],'y',label='Residual r[1]', markersize=10)
+    plt.plot([x[2], x[2]], [y[2], y[2]+r[2]],'k',label='Residual r[2]', markersize=10)
+    plt.plot([x[3], x[3]], [y[3], y[3]+r[3]],'m',label='Residual r[3]', markersize=10)
+    plt.plot([x[4], x[4]], [y[4], y[4]+r[4]],'c',label='Residual r[4]', markersize=10)
+    plt.legend()
+    plt.show()  
+
+# Del e)
+def MK_ansats_trig():
+    x = np.array([4, 5, 6, 7, 8])
+    y = np.array([871, 1021, 1109, 1066, 929])
+    ones = np.ones(np.shape(x))
+    w = 2*np.pi/12
+
+    A = np.array([ones, np.cos(w*x), np.sin(w*x)]).T
+    print(A)
+
+    aTa = A.T @ A
+    aTy = A.T @ y
+    c = np.linalg.solve(aTa, aTy)
+    for i in range(len(c)):
+        print(f"c[{i}] = {c[i]}")
+
+    def model(c, x, w):
+        return c[0] + c[1]*np.cos(w*x) + c[2]*np.sin(w*x)
+    
+    r = A@c - y
+    MKfel = sum(r**2)
+
+    print(f"MK-fel: {MKfel}")
+
+    xfine = np.linspace(x[0], x[-1], num=1000)
+    yfine = model(c, xfine, w)
+    plt.plot(x, y, 'o', label='Data', markersize=10)
+    plt.plot(xfine, yfine, 'r', label='Anpassad rät linje')
+    plt.plot([x[0], x[0]], [y[0], y[0]+r[0]],'g',label='Residual r[0]', markersize=10)
+    plt.plot([x[1], x[1]], [y[1], y[1]+r[1]],'y',label='Residual r[1]', markersize=10)
+    plt.plot([x[2], x[2]], [y[2], y[2]+r[2]],'k',label='Residual r[2]', markersize=10)
+    plt.plot([x[3], x[3]], [y[3], y[3]+r[3]],'m',label='Residual r[3]', markersize=10)
+    plt.plot([x[4], x[4]], [y[4], y[4]+r[4]],'c',label='Residual r[4]', markersize=10)
+    plt.legend()
+    plt.show()
+
+
 
 while True: 
-    chois = int(input("välj"))
+    chois = int(input("Choose method to run (1-6) or any other key to exit:\n1. Naiv ansats\n2. Newton ansats\n3. Centrerad ansats\n4. MK ansats\n5. MK ansats tredgerad\n6. MK ansats trigonometrisk\n"))
     if chois == 1:
         naiv_ansats()
     elif chois == 2:
         newton_ansats()
     elif chois == 3:
         centrerad_ansats()
-
+    elif chois == 4:
+        MK_ansats()
+    elif chois == 5:
+        MK_ansats_tredgerad()
+    elif chois == 6:
+        MK_ansats_trig()
     else:
         break
