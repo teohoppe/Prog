@@ -31,6 +31,7 @@ def naiv_ansats():
     plt.legend()
     plt.grid(True)
     plt.show()
+    return Anaiv, y_smooth
 
 
 def newton_ansats():
@@ -78,6 +79,7 @@ def newton_ansats():
     plt.legend()
     plt.grid(True)
     plt.show()
+    return Anewt, yfine
 
 
 def centrerad_ansats():
@@ -108,10 +110,66 @@ def centrerad_ansats():
     plt.legend()
     plt.grid(True)
     plt.show()
+    return Acenterd, y_smooth
         
+def abs_diff():
+    Anaiv, y_naiv = naiv_ansats()
+    Anewt, y_newt = newton_ansats()
+    Acent, y_cent = centrerad_ansats()
+
+    abs_diff_n_newt = np.max(np.abs(y_naiv - y_newt))
+    abs_diff_n_cent = np.max(np.abs(y_naiv - y_cent))
+    abs_diff_newt_cent = np.max(np.abs(y_newt - y_cent))
+    print("Absolut skillnad mellan naiv och Newtons ansats:")
+    print(abs_diff_n_newt)
+    print("\nAbsolut skillnad mellan naiv och centrerad ansats:")
+    print(abs_diff_n_cent)
+    print("\nAbsolut skillnad mellan Newtons och centrerad ansats:")
+    print(abs_diff_newt_cent)
+
+# Del b)
+def condition_number():
+    error = np.spacing(1) # Error in machine precision
+
+    # Calculate condition numbers and relative error bounds for each method
+    AN = naiv_ansats()
+    cond_number_n = np.linalg.cond(AN, p = np.inf)
+    print(f'Condition number naiv (infinity norm): {cond_number_n}')
+    print(error)
+    rel_fel = cond_number_n * error
+    print(f'Relative error naiv bound: {rel_fel}')
+
+    Anewt = newton_ansats()
+    cond_number_newt = np.linalg.cond(Anewt, p = np.inf)
+    print(f'Condition number Newton (infinity norm): {cond_number_newt}')
+    rel_fel_newt = cond_number_newt * error
+    print(f'Relative error Newton bound: {rel_fel_newt}')
+
+    AC = centrerad_ansats()
+    cond_number_cent = np.linalg.cond(AC, p = np.inf)
+    print(f'Condition number centrerad (infinity norm): {cond_number_cent}')
+    rel_fel_cent = cond_number_cent * error
+    print(f'Relative error centrerad bound: {rel_fel_cent}')
+
+    AKM = MK_ansats()
+    cond_number_MK = np.linalg.cond(AKM, p = np.inf)
+    print(f'Condition number MK (infinity norm): {cond_number_MK}')
+    rel_fel_MK = cond_number_MK * error
+    print(f'Relative error MK bound: {rel_fel_MK}')
+
+    AMK3 = MK_ansats_tredgerad()
+    cond_number_MK3 = np.linalg.cond(AMK3, p = np.inf)
+    print(f'Condition number MK tredgerad (infinity norm): {cond_number_MK3}')
+    rel_fel_MK3 = cond_number_MK3 * error
+    print(f'Relative error MK tredgerad bound: {rel_fel_MK3}')
+
+    AMKtrig = MK_ansats_trig()
+    cond_number_MKtrig = np.linalg.cond(AMKtrig, p = np.inf)
+    print(f'Condition number MK trigonometrisk (infinity norm): {cond_number_MKtrig}')
+    rel_fel_MKtrig = cond_number_MKtrig * error
+    print(f'Relative error MK trigonometrisk bound: {rel_fel_MKtrig}')
 
 # Del c)
-
 def MK_ansats():
     x = np.array([4, 5, 6, 7, 8])
     y = np.array([871, 1021, 1109, 1066, 929])
@@ -149,6 +207,7 @@ def MK_ansats():
     plt.plot([x[4], x[4]], [y[4], y[4]+r[4]],'c',label='Residual r[4]', markersize=10)
     plt.legend()
     plt.show()    
+    return aTa
 
 # Del d)
 def MK_ansats_tredgerad():
@@ -186,6 +245,7 @@ def MK_ansats_tredgerad():
     plt.plot([x[4], x[4]], [y[4], y[4]+r[4]],'c',label='Residual r[4]', markersize=10)
     plt.legend()
     plt.show()  
+    return aTa
 
 # Del e)
 def MK_ansats_trig():
@@ -222,22 +282,26 @@ def MK_ansats_trig():
     plt.plot([x[4], x[4]], [y[4], y[4]+r[4]],'c',label='Residual r[4]', markersize=10)
     plt.legend()
     plt.show()
-
+    return aTa
 
 
 while True: 
-    chois = int(input("Choose method to run (1-6) or any other key to exit:\n1. Naiv ansats\n2. Newton ansats\n3. Centrerad ansats\n4. MK ansats\n5. MK ansats tredgerad\n6. MK ansats trigonometrisk\n"))
-    if chois == 1:
+    chois = (input("Choose method to run (1-8) or any other key to exit:\n1. Naiv ansats\n2. Newton ansats\n3. Centrerad ansats\n4. MK ansats\n5. MK ansats tredgerad\n6. MK ansats trigonometrisk\n7. Condtion number\n8. Absolut diffrens\n:  "))
+    if chois == "1":
         naiv_ansats()
-    elif chois == 2:
+    elif chois == "2":
         newton_ansats()
-    elif chois == 3:
+    elif chois == "3":
         centrerad_ansats()
-    elif chois == 4:
+    elif chois == "4":
         MK_ansats()
-    elif chois == 5:
+    elif chois == "5":
         MK_ansats_tredgerad()
-    elif chois == 6:
+    elif chois == "6":
         MK_ansats_trig()
+    elif chois == "7":
+        condition_number()
+    elif chois == "8":
+        abs_diff()
     else:
         break

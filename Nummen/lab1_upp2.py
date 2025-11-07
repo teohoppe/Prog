@@ -18,6 +18,7 @@ def plot_function():
     plt.ylabel("Y") 
     plt.show()
 
+plot_function()
 
 # b)
 def find_zero_points():
@@ -34,6 +35,7 @@ def find_zero_points():
     
     print(g(0.3))
     print(gprim(0.3))
+    
     for i in range(len(zero_points)):
         print(f"g({zero_points[i]}) = {g(zero_points[i])}")
         print(f"g'({zero_points[i]}) = {gprim(zero_points[i])}")
