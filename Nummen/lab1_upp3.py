@@ -100,5 +100,61 @@ def simpsons_rule():
     return Sh
 
 
-richardson_extrapolation()
-simpsons_rule()
+#richardson_extrapolation()
+#simpsons_rule()
+
+def MK():
+    t = np.array([2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024])
+    f_values = np.array([12, 15.10, 19.01, 23.92, 30.11, 37.90, 47.70, 60.03, 75.56])
+
+    # Linjärisering
+    x = t - 2016
+    y = np.log(f_values)
+
+    # Bygg designmatris
+    A = np.array([np.ones(len(x)), x]).T
+
+    # Minstakvadratanpassning
+    coeffs = np.linalg.solve(A.T @ A, A.T @ y)
+    c0, c1 = coeffs
+    
+    # Omvandla tillbaka
+    a = np.exp(c0)
+    b = c1
+
+    print(f"a = {a}")
+    print(f"b = {b}")
+
+    # Modellfunktion
+    def model(t):
+        return a * np.exp(b * (t - 2016))
+
+    est_2025 = model(2025)
+    print(f"Estimated production for 2025: {est_2025}")
+
+    # g)
+    new_bounds = [2016, 2025]
+    integral_result = trapets(n, new_bounds, model)
+    print(f'Integral from 2016 to 2025: {integral_result}')    
+
+
+    # f) continued
+    print(t)
+    # Plott
+    t_fit = np.linspace(2016, 2024, 1000)
+    plt.plot(t, f_values, 'b*', label="Data")
+    plt.plot(t_fit, model(t_fit), 'm', label="Minstakvadratanpassning")
+
+    t_fit_extended = np.linspace(2024, 2025, 1000)
+    plt.plot(t_fit_extended, model(t_fit_extended), 'c--', label="Prognos för 2025")
+    plt.plot(2025, est_2025, 'rx')
+
+    plt.yticks(np.arange(0, 120, 10))
+    plt.xticks(np.arange(2016, 2026, 1))
+
+    plt.legend()
+    plt.show()
+
+MK()
+
+
