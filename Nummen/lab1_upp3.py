@@ -41,8 +41,6 @@ def trapets(antal_I, bounds, func):
 
     return Th[-1]
 
-#print(trapets(n, gränser, f))
-
 # c)
 def trapets2():
     h = 1
@@ -52,8 +50,6 @@ def trapets2():
     print(Th)
     
     return Th
-
-#trapets2()
 
 # d)
 def trapets3():
@@ -76,7 +72,6 @@ def trapets3():
     print(f'Den beräknade noggrannhetsordningen för Trapetsregeln blir {p}')
     
     return Th, p
-#trapets3()
 
 # e)
 def richardson_extrapolation():
@@ -90,7 +85,6 @@ def richardson_extrapolation():
 
     return T_richardson
 
-
 def simpsons_rule():
     h = 1
     f_values = np.array([12, 15.10, 19.01, 23.92, 30.11, 37.90, 47.70, 60.03, 75.56])
@@ -99,10 +93,7 @@ def simpsons_rule():
 
     return Sh
 
-
-#richardson_extrapolation()
-#simpsons_rule()
-
+# f) o g)
 def MK():
     t = np.array([2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024])
     f_values = np.array([12, 15.10, 19.01, 23.92, 30.11, 37.90, 47.70, 60.03, 75.56])
@@ -155,6 +146,37 @@ def MK():
     plt.legend()
     plt.show()
 
-MK()
+def menu():
+    while True:
+        print("\n=== Menu ===")
+        print("1. Trapezoidal Rule (part a)")
+        print("2. Trapezoidal Rule with Given Data (part c)")
+        print("3. Trapezoidal Rule with Sampling (part d)")
+        print("4. Richardson Extrapolation (part e)")
+        print("5. Simpson's Rule (part c)")
+        print("6. Least Squares Fitting & Integration (part f-g)")
+        print("0. Exit")
+        
+        choice = input("\nEnter your choice: ")
+        
+        if choice == '1':
+            trapets(n, gränser, f)
+        elif choice == '2':
+            trapets2()
+        elif choice == '3':
+            trapets3()
+        elif choice == '4':
+            richardson_extrapolation()
+        elif choice == '5':
+            simpsons_rule()
+        elif choice == '6':
+            MK()
+        elif choice == '0':
+            print("Exiting...")
+            break
+        else:
+            print("Invalid choice. Please try again.")
 
+if __name__ == "__main__":
+    menu()
 
