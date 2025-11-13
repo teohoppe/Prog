@@ -18,8 +18,6 @@ def plot_function():
     plt.ylabel("Y") 
     plt.show()
 
-plot_function()
-
 # b)
 def find_zero_points():
     L = 1
@@ -35,14 +33,12 @@ def find_zero_points():
     
     print(g(0.3))
     print(gprim(0.3))
-    
+
     for i in range(len(zero_points)):
         print(f"g({zero_points[i]}) = {g(zero_points[i])}")
         print(f"g'({zero_points[i]}) = {gprim(zero_points[i])}")
         if abs(gprim(zero_points[i])) < 1:
             print(f"Fixpunktssatsen är uppfylld vid x = {zero_points[i]}")
-
-find_zero_points()
 
 
 # c)
@@ -56,7 +52,7 @@ def fixed_point_iteration():
         return g
 
     # Initialise variables
-    x = 0.3
+    x = 0.85
     tol = 1E-10
     diffv = 5
     i = 0
@@ -86,13 +82,11 @@ def fixed_point_iteration():
     print(konvergens)  
     return diffvec_fp
 
-#fixed_point_iteration()
 
 # d)
 def newtons_method():
     print("Newtons metod")
     L = 1
-    x = np.linspace(0, L, 1000)
 
     def f_fun():
         f = 8/3*x/L - 3*(x/L)**2 + 1/3*(x/L)**3 - 2/3*(np.sin((np.pi*x)/L))
@@ -113,7 +107,7 @@ def newtons_method():
     diffvec = np.array([])
 
     # Iterera fram en lösning
-    while diffv > tol and iter < 20:
+    while diffv > tol and iter < 1000:
         iter += 1
         f,fp = f_fun(),df_fun()
         xnew = x-f/fp
@@ -138,6 +132,87 @@ def newtons_method():
 
     # Tabell som visar hur metoden konvergerar
     print(konvergens) 
+    return diffvec
+
+# e) 
+
+def compare_convergence():
+    print("\nJämförelse av konvergenshastighet\n")
+    
+    L = 1
+    x0 = 0.8  # Common starting point
+    tol = 1e-10
+    max_iter = 1000
+
+    def g(x):
+        return (3*L/8.0)*(3*(x/L)**2 - (1/3)*(x/L)**3 + (2/3)*np.sin(np.pi*x/L))
+
+    def f(x):
+        return 8/3*x/L - 3*(x/L)**2 + 1/3*(x/L)**3 - 2/3*np.sin(np.pi*x/L)
+
+    def df(x):
+        return 8/3/L - 6*x/L**2 + x**2/L**3 - 2/3*(np.pi/L)*np.cos(np.pi*x/L)
+
+    # Fixedpoint 
+    x = x0
+    fp_errors = []
+    for _ in range(max_iter):
+        x_new = g(x)
+        fp_errors.append(abs(x_new - x))
+        if abs(x_new - x) < tol:
+            break
+        x = x_new
+
+    # Newtons
+    x = x0
+    newton_errors = []
+    for _ in range(max_iter):
+        x_new = x - f(x)/df(x)
+        newton_errors.append(abs(x_new - x))
+        if abs(x_new - x) < tol:
+            break
+        x = x_new
+
+    plt.semilogy(fp_errors, label="Fixpunkt")
+    plt.semilogy(newton_errors, label="Newton")
+    plt.xlabel("Iteration n")
+    plt.ylabel("|xₙ₊₁ − xₙ|")
+    plt.title("Konvergensjämförelse")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+    print("Fixpunkt sista fel:", fp_errors[-1])
+    print("Newton sista fel:", newton_errors[-1])
 
 
-#newtons_method()
+def main_menu():
+    while True:
+        print("\nVälj en funktion att köra:")
+        print("1. Plotta funktion (a)")
+        print("2. Nollställen och fixpunktssats (b)")
+        print("3. Fixpunktsmetoden (c)")
+        print("4. Newtons metod (d)")
+        print("5. Jämför konvergenshastighet (e)")
+        print("6. Avsluta")
+
+        choice = input("Ange val (1-5): ")
+
+        if choice == "1":
+            plot_function()
+        elif choice == "2":
+            find_zero_points()
+        elif choice == "3":
+            fixed_point_iteration()
+        elif choice == "4":
+            newtons_method()
+        elif choice == "5":
+            compare_convergence()
+        elif choice == "6":
+            print("Avslutar programmet.")
+            break
+        else:
+            print("Ogiltigt val, försök igen.")
+
+if __name__ == "__main__":
+    main_menu()

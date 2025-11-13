@@ -132,26 +132,26 @@ def condition_number():
     error = np.spacing(1) # Error in machine precision
 
     # Calculate condition numbers and relative error bounds for each method
-    AN = naiv_ansats()
+    AN, trash = naiv_ansats()
     cond_number_n = np.linalg.cond(AN, p = np.inf)
     print(f'Condition number naiv (infinity norm): {cond_number_n}')
     print(error)
     rel_fel = cond_number_n * error
     print(f'Relative error naiv bound: {rel_fel}')
 
-    Anewt = newton_ansats()
+    Anewt, trash = newton_ansats()
     cond_number_newt = np.linalg.cond(Anewt, p = np.inf)
     print(f'Condition number Newton (infinity norm): {cond_number_newt}')
     rel_fel_newt = cond_number_newt * error
     print(f'Relative error Newton bound: {rel_fel_newt}')
 
-    AC = centrerad_ansats()
+    AC, trash = centrerad_ansats()
     cond_number_cent = np.linalg.cond(AC, p = np.inf)
     print(f'Condition number centrerad (infinity norm): {cond_number_cent}')
     rel_fel_cent = cond_number_cent * error
     print(f'Relative error centrerad bound: {rel_fel_cent}')
 
-    AKM = MK_ansats()
+    AKM= MK_ansats()
     cond_number_MK = np.linalg.cond(AKM, p = np.inf)
     print(f'Condition number MK (infinity norm): {cond_number_MK}')
     rel_fel_MK = cond_number_MK * error
