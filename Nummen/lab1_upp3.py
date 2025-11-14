@@ -138,11 +138,12 @@ def MK():
 
     t_fit_extended = np.linspace(2024, 2025, 1000)
     plt.plot(t_fit_extended, model(t_fit_extended), 'c--', label="Prognos för 2025")
-    plt.plot(2025, est_2025, 'rx')
+    plt.plot(2025, est_2025, 'rx', label="Estimerad elproduktion år 2025")
 
     plt.yticks(np.arange(0, 120, 10))
-    plt.xticks(np.arange(2016, 2026, 1))
+    plt.xticks(np.arange(2016, 2027, 1))
 
+    plt.grid()
     plt.legend()
     plt.show()
 
