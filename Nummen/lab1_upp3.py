@@ -79,7 +79,7 @@ def richardson_extrapolation():
     Th, p = trapets3()
     
     # Using the two finest step sizes (most accurate): Th[-2] and Th[-1]
-    p_order = p  # Trapezoidal rule has order 2
+    p_order = 2  # Trapezoidal rule has order 2
     T_richardson = (2**p_order * Th[0] - Th[1]) / (2**p_order - 1)
     print(f'\nRichardson extrapolation: {T_richardson}')
 

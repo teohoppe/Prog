@@ -1,37 +1,101 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
 
-def MK():
-    t = np.array([2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024])
-    f_values = np.array([12, 15.10, 19.01, 23.92, 30.11, 37.90, 47.70, 60.03, 75.56])
+# ============================
+#   PARAMETRAR
+# ============================
+L = 2
+C = 0.5
+R = 1
 
-    # Linjärisering
-    x = t - 2016
-    y = np.log(f_values)
+# ODE-systemet
+def F(t, y):
+    q, i = y
+    dqdt = i
+    didt = -(R/L) * i - (1/(L*C)) * q
+    return [dqdt, didt]
 
-    # Bygg designmatris
-    A = np.vstack([np.ones(len(x)), x]).T
 
-    # Least squares-lösning
-    coeffs = np.linalg.solve(A.T @ A, A.T @ y)
-    c0, c1 = coeffs
-    
-    # Omvandla tillbaka
-    a = np.exp(c0)
-    b = c1
+# ============================
+#   EULER FRAMÅT
+# ============================
+def euler_forward_system(F, y0, t0, T, N):
+    h = (T - t0) / N
+    t = t0
+    y = np.array(y0, float)
 
-    print(f"a = {a}")
-    print(f"b = {b}")
+    t_list = [t]
+    y_list = [y.copy()]
 
-    # Modellfunktion
-    def model(t):
-        return a * np.exp(b * (t - 2016))
+    for _ in range(N):
+        y = y + h * np.array(F(t, y))
+        t = t + h
+        t_list.append(t)
+        y_list.append(y.copy())
 
-    # Plott
-    t_fit = np.linspace(2016, 2024, 500)
-    plt.plot(t, f_values, 'o', label="Data")
-    plt.plot(t_fit, model(t_fit), label="Minstakvadratanpassning")
+    return np.array(t_list), np.array(y_list)
+
+
+# ============================
+#   REFERENSLÖSNING
+# ============================
+y0 = [1, 0]
+t_span = (0, 20)
+
+sol = solve_ivp(F, t_span, y0, method="RK45", rtol=1e-8, atol=1e-10, dense_output=True)
+t_ref = np.linspace(0, 20, 2000)
+y_ref = sol.sol(t_ref)
+
+
+# ============================
+#   N-VÄRDEN
+# ============================
+N_values = [20, 40, 80, 160]
+
+stable = []
+unstable = []
+
+
+# ============================
+#   LOOP FÖR ALLA N
+# ============================
+for N in N_values:
+
+    t_e, y_e = euler_forward_system(F, y0, 0, 20, N)
+
+    # Plotta q(t)
+    plt.figure(figsize=(8,4))
+    plt.plot(t_ref, y_ref[0], label="Referens q(t)")
+    plt.plot(t_e, y_e[:,0], "o--", label=f"Euler q(t), N={N}")
+    plt.grid()
+    plt.xlabel("t")
+    plt.ylabel("q(t)")
+    plt.title(f"q(t) jämförelse – N={N}")
     plt.legend()
     plt.show()
 
-MK()
+    # Plotta i(t)
+    plt.figure(figsize=(8,4))
+    plt.plot(t_ref, y_ref[1], label="Referens i(t)")
+    plt.plot(t_e, y_e[:,1], "o--", label=f"Euler i(t), N={N}")
+    plt.grid()
+    plt.xlabel("t")
+    plt.ylabel("i(t)")
+    plt.title(f"i(t) jämförelse – N={N}")
+    plt.legend()
+    plt.show()
+
+    # Enkel stabilitetskoll: om Euler blåser upp jämfört med referens
+    if np.max(np.abs(y_e)) > 5 * np.max(np.abs(y_ref)):
+        unstable.append(N)
+    else:
+        stable.append(N)
+
+
+# ============================
+#   RESULTAT
+# ============================
+print("\nRESULTAT:")
+print("Stabila N:", stable)
+print("Instabila N:", unstable)
