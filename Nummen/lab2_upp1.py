@@ -89,14 +89,17 @@ def if_stable():
 
     y_ref = sol_ref.y[:, -1]   # [q(T), i(T)]
 
-    print("\nReferenslösning i(T) =", y_ref[1])
+    print("Referenslösning y1 =", y_ref[0])
+    print("\nReferenslösning y2 =", y_ref[1])
 
     # --- Lista på N som antas stabila ---
     stable_N = [40, 80, 160, 320, 640, 1280, 2560, 5120, 10240]
 
     errors = []
+    errors1 = []
     h_values = []
     uN_values = []
+    uN1_values = []
 
     for n in stable_N:
         h = (t_span[-1] - t_span[0]) / n
@@ -105,16 +108,26 @@ def if_stable():
         # Euler framåt
         yN = euler_forward(ODE_function, U0, t_span[0], t_span[-1], n, R, C, L)
 
-        uN = yN[1]  # strömmen i(T)
+        uN1 = yN[0]  
+        uN = yN[1] 
+        uN1_values.append(uN1)
         uN_values.append(uN)
 
         error = abs(y_ref[1] - uN)
         errors.append(error)
+        error1 = abs(y_ref[0] - uN1)
+        errors1.append(error1)
 
-        print(f"h = {h:.6f},   i_N(T) = {uN:.10f},   Fel = {error:.3e}")
+        print(f"h = {h:.6f},   y1 = {uN1:.10f},  Fel y1 = {error1:.3e}")
+        print(f"h = {h:.6f},   y2 = {uN:.10f},   Fel y2= {error:.3e}")
 
     # --- Noggrannhetsordning ---
-    print("\nNoggrannhetsordning p:")
+    print("\nNoggrannhetsordning p1:")
+    for i in range(len(errors1)-1):
+        p1 = np.log2(errors1[i] / errors1[i+1])
+        print(f"N={stable_N[i]:5d} → N={stable_N[i+1]:5d},   p1 = {p1:.6f}")
+
+    print("\nNoggrannhetsordning p2:")
     for i in range(len(errors)-1):
         p = np.log2(errors[i] / errors[i+1])
         print(f"N={stable_N[i]:5d} → N={stable_N[i+1]:5d},   p = {p:.6f}")
