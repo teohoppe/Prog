@@ -79,6 +79,6 @@ plt.grid()
 plt.show()
 
 # # Uppgift 4
-
+#
 # def f1(d, Ds):
 #     return Q / (Uf * Tm)
